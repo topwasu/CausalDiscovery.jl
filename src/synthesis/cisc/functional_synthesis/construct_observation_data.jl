@@ -38,7 +38,7 @@ function generate_observations_interface(model_name, i=1; dir="")
 end
 
 function generate_observations_custom_input(m::Module, user_events)
-  observations = []  
+  observations = []
   state = Base.invokelatest(m.init, nothing, nothing, nothing, nothing, nothing)
   push!(observations, Base.invokelatest(m.render, state.scene))
 
@@ -69,6 +69,36 @@ function generate_observations_custom_input(m::Module, user_events)
   end
   observations
 end
+
+function generate_observations_custom_input_w_state(m::Module, user_events, state)
+    observations = []
+    for i in 1:length(user_events)
+      event = user_events[i]
+      if event == "left"
+        state = Base.invokelatest(m.next, state, nothing, Base.invokelatest(m.Left), nothing, nothing, nothing)
+        push!(user_events, event)
+      elseif event == "right"
+        state = Base.invokelatest(m.next, state, nothing, nothing, Base.invokelatest(m.Right), nothing, nothing)
+        push!(user_events, event)
+      elseif event == "up"
+        state = Base.invokelatest(m.next, state, nothing, nothing, nothing, Base.invokelatest(m.Up), nothing)
+        push!(user_events, event)
+      elseif event == "down"
+        state = Base.invokelatest(m.next, state, nothing, nothing, nothing, nothing, Base.invokelatest(m.Down))
+        push!(user_events, event)
+      elseif occursin("click", event)
+        x = parse(Int, split(event, " ")[2])
+        y = parse(Int, split(event, " ")[3])
+        state = Base.invokelatest(m.next, state, Base.invokelatest(m.Click, x, y), nothing, nothing, nothing, nothing)
+        push!(user_events, event)
+      else
+        state = Base.invokelatest(m.next, state, nothing, nothing, nothing, nothing, nothing)
+        push!(user_events, nothing)
+      end
+      push!(observations, Base.invokelatest(m.render, state.scene))
+    end
+    observations, state
+  end
 
 function generate_observations_ice(m::Module)
   state = Base.invokelatest(m.init, nothing, nothing, nothing, nothing, nothing)

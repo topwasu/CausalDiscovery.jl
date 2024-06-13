@@ -273,6 +273,21 @@ function generate_observations_custom_input(model_name::String, user_events)
   generate_observations_custom_input(m, user_events)
 end
 
+function get_initialized_m(model_name::String)
+    if occursin("double_count_", model_name)
+        program_expr = compiletojulia(parseautumn(programs["double_count"]))
+    elseif occursin("count_", model_name)
+        program_expr = compiletojulia(parseautumn(programs["count"]))
+    else
+        program_expr = compiletojulia(parseautumn(programs[model_name]))  
+    end
+    m = eval(program_expr)
+    observations = []
+    state = Base.invokelatest(m.init, nothing, nothing, nothing, nothing, nothing)
+    push!(observations, Base.invokelatest(m.render, state.scene))
+    m, observations, state
+end
+
 
 programs = Dict("particles"                                 => """(program
                                                                   (= GRID_SIZE 16)

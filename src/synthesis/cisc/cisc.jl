@@ -1,4 +1,4 @@
-import Pkg; Pkg.add("Pickle")
+module Cisc
 using Autumn
 using JLD 
 using Dates
@@ -374,3 +374,4 @@ end
 # # open("DONE/DONE_$(model_name)_TIME_heuristic.txt", "w") do io 
 # #   println(io, x.time)
 # # end
+end

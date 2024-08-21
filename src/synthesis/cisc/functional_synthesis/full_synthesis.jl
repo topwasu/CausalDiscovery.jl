@@ -675,6 +675,7 @@ programs = Dict("particles"                                 => """(program
                                                                     (object Enemy (: movingLeft Bool) (: lives Int) (list (Cell -1 0 "blue") (Cell 0 0 "blue") (Cell 1 0 "blue")
                                                                                                         (Cell -1 1 "blue") (Cell 0 1 "blue") (Cell 1 1 "blue")))
                                                                     (object Bullet (Cell 0 0 "mediumpurple"))
+                                                                    (object Border (vcat (map (--> pos (Cell pos "black")) (vcat (rect (Position 0 0) (Position 17 0)) (rect (Position 0 17) (Position 17 17)) (rect (Position 0 1) (Position 0 16)) (rect (Position 17 1) (Position 17 16))))))
                                                                     
                                                                     (: mario Mario)
                                                                     (= mario (initnext (Mario 0 (Position 7 15)) (if (intersects (moveDown (prev mario)) (prev coins)) then (moveDown (prev mario)) else (moveDownNoCollision (prev mario)))))
@@ -696,6 +697,9 @@ programs = Dict("particles"                                 => """(program
                                                                     
                                                                     (: numBullets Int)
                                                                     (= numBullets (initnext 0 (prev numBullets)))
+
+                                                                    (: border Border)
+                                                                    (= border (initnext (Border (Position -1 -1)) (prev border)))
                                                                     
                                                                     (on (== (.. (.. (prev enemy) origin) x) 1) (= enemy (moveRight (updateObj (prev enemy) "movingLeft" false))))
                                                                     (on (== (.. (.. (prev enemy) origin) x) 14) (= enemy (moveLeft (updateObj (prev enemy) "movingLeft" true))))
